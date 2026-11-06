@@ -1,2 +1,0 @@
-# ARIESTRONIC-POS
-Aplikasi Kasir ARIESTRONIC
