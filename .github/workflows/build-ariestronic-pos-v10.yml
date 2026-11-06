@@ -1,0 +1,46 @@
+name: Build ARIESTRONIC POS V10
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install SDK
+        run: sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Extract ZIP
+        run: |
+          mkdir source
+          unzip -q AriestronicPOS_Android_Source_v10_Diskon.zip -d source
+
+      - name: Build APK
+        run: |
+          GRADLEW=$(find source -name gradlew | head -n 1)
+          test -n "$GRADLEW"
+          cd "$(dirname "$GRADLEW")"
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: ARIESTRONIC-POS-APK
+          path: source/**/*.apk
